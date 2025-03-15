@@ -1,0 +1,48 @@
+repos:
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.5.0
+    hooks:
+      - id: yesqa
+
+  - repo: https://github.com/psf/black
+    rev: "24.10.0"
+    hooks:
+      - id: black
+        language_version: python3.10
+        args:
+          - -l 120
+          - --fast
+
+  - repo: https://github.com/PyCQA/isort
+    rev: "5.13.2"
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--filter-files"]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-xml
+      - id: check-executables-have-shebangs
+      - id: check-toml
+      - id: check-yaml
+        args: ["--unsafe"] # 允许 YAML 解析 tuple
+      - id: check-added-large-files
+      - id: check-symlinks
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: "v0.19.1"
+    hooks:
+      - id: gitlint
+        stages: [commit-msg] # 仅在 commit-msg 阶段执行
+
+exclude: "^static/|venv/|.venv/|migrations/"
+default_stages: [pre-commit, pre-push]

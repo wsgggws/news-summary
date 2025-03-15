@@ -1,0 +1,145 @@
+services:
+  # Web 服务（基于您的 Dockerfile 构建）
+  web:
+    build:
+      context: . # 使用当前目录下的 Dockerfile
+      dockerfile: Dockerfile # 指定 Dockerfile 路径
+    container_name: news-summary-web # 自定义容器名称
+    volumes:
+      - .:/news-summary:z # 确保和 Dockerfile 里的 WORKDIR 一致
+      - /news-summary/.venv # 避免覆盖 .venv, 开发环境必须要设置
+    ports:
+      - "8000:8000" # 暴露 FastAPI 端口
+    env_file:
+      - .env # 加载环境变量
+    depends_on:
+      - db
+      # - redis
+    networks:
+      - app-network
+
+  # 数据库服务
+  db:
+    image: postgres:13
+    container_name: news-summary-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: newsdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # 将宿主机的 5432 端口映射到容器的 5432 端口
+    networks:
+      - app-network
+
+  # Redis 服务
+  # redis:
+  #   image: redis:6
+  #   container_name: news-summary-redis
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - app-network
+
+  # Celery 服务
+  # celery:
+  #   build:
+  #     context: . # 使用与 web 相同的 Dockerfile
+  #     dockerfile: Dockerfile
+  #   container_name: news-summary-celery
+  #   command: celery -A app.tasks.celery_app worker --loglevel=info
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   networks:
+  #     - app-network
+
+  # Sentry 服务
+  # sentry:
+  #   image: sentry:latest
+  #   container_name: news-summary-sentry
+  #   depends_on:
+  #     - sentry-postgres
+  #     - sentry-redis
+  #   environment:
+  #     SENTRY_SECRET_KEY: "your-sentry-secret-key"
+  #     SENTRY_POSTGRES_HOST: sentry-postgres
+  #     SENTRY_DB_USER: sentry
+  #     SENTRY_DB_PASSWORD: sentry
+  #     SENTRY_DB_NAME: sentry
+  #     SENTRY_REDIS_HOST: sentry-redis
+  #   ports:
+  #     - "9000:9000"
+  #   networks:
+  #     - app-network
+  #   command: |
+  #     bash -c "
+  #     sentry upgrade --noinput &&
+  #     sentry run web"
+
+  # Sentry 的 PostgreSQL 数据库
+  # sentry-postgres:
+  #   image: postgres:13
+  #   container_name: news-summary-sentry-postgres
+  #   environment:
+  #     POSTGRES_USER: sentry
+  #     POSTGRES_PASSWORD: sentry
+  #     POSTGRES_DB: sentry
+  #   volumes:
+  #     - sentry_postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
+
+  # Sentry 的 Redis
+  # sentry-redis:
+  #   image: redis:6
+  #   container_name: news-summary-sentry-redis
+  #   volumes:
+  #     - sentry_redis_data:/data
+  #   networks:
+  #     - app-network
+
+  # Prometheus 服务
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: news-summary-prometheus
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus:/etc/prometheus # 挂载 Prometheus 配置文件
+  #   command:
+  #     - "--config.file=/etc/prometheus/prometheus.yml"
+  #   networks:
+  #     - app-network
+
+  # Grafana 服务
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: news-summary-grafana
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   environment:
+  #     GF_SECURITY_ADMIN_USER: admin
+  #     GF_SECURITY_ADMIN_PASSWORD: admin
+  #   depends_on:
+  #     - prometheus
+  #   networks:
+  #     - app-network
+
+# 定义卷
+volumes:
+  postgres_data:
+  # redis_data:
+  # sentry_postgres_data:
+  # sentry_redis_data:
+  # grafana_data:
+
+# 定义网络
+networks:
+  app-network:
+    driver: bridge
