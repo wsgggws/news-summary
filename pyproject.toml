@@ -8,7 +8,6 @@ requires-python = ">=3.11"
 dependencies = [
     "fastapi (>=0.68.0)",
     "uvicorn (>=0.15.0)",
-    "passlib (>=1.7.4,<2.0.0)",
     "python-jose[cryptography] (>=3.4.0,<4.0.0)",
     "pydantic (>=2.10.6,<3.0.0)",
     "pydantic[email] (>=2.10.6,<3.0.0)",
@@ -17,6 +16,8 @@ dependencies = [
     "python-dotenv (>=1.0.1,<2.0.0)",
     "sqlalchemy (>=2.0.39,<3.0.0)",
     "databases (>=0.9.0,<0.10.0)",
+    "argon2-cffi (>=23.1.0,<24.0.0)",
+    "passlib (>=1.7.4,<2.0.0)",
 ]
 
 
@@ -27,5 +28,22 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 package-mode = false
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+pytest-asyncio = { extras = ["trio"], version = "^0.25.3" }
+httpx = "^0.28.1"
+sqlalchemy = "^2.0.39"
+alembic = "^1.15.1"
+trio = "^0.29.0"
+asgi-lifespan = "^2.1.0"
+pytest-ordering = "^0.6"
+pytest-cov = "^6.0.0"
+
 [tool.black]
 line-length = 120
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+filterwarnings = "ignore::DeprecationWarning"
+addopts = "--cov=app --cov-report=html --cov-report=xml"

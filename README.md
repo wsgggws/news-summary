@@ -1,4 +1,6 @@
-# 📰 news-summary
+# 📰 News-Summary
+
+[![Codecov](https://codecov.io/gh/wsgggws/news-summary/branch/main/graph/badge.svg)](https://codecov.io/gh/wsgggws/news-summary)
 
 **AI 生成个性化新闻摘要**，并将在 [Bilibili](https://space.bilibili.com/472722204?spm_id_from=333.1007.0.0) 上进行分享，敬请期待！🚀
 
@@ -20,8 +22,8 @@
 
 - [x] 用户身份验证 & 登录
 - [x] Docker 一键启动
+- [x] 单元测试（Pytest）
 - [ ] Dynaconf（配置管理）
-- [ ] 单元测试（Pytest）
 - [ ] 错误追踪 & 报警机制（Sentry + Prometheus + Grafana）
 - [ ] 新闻爬取 & 存储（asyncio + aiohttp + parsel）
 - [ ] AI 生成摘要（GPT / Hugging Face）
@@ -53,26 +55,34 @@
 
 ---
 
-## 🧪 **测试**
+## 🚀 **如何本地运行**
 
-- 📌 `poetry run pytest tests` - 运行所有测试文件
-- 📌 `poetry run pytest test ...` - 运行单个测试文件
+```sh
+pip install poetry==1.4.2
+poetry install
+cp env.sample .env
+docker-compose up -d
+uvicorn app.main:app --reload
+```
 
 ---
 
-## 🚀 **如何运行**
+## 🧪 **测试**
 
-1. 复制 `.env.sample` 为 `.env` 文件：
+```sh
+pip install poetry==1.4.2
+poetry install
+docker-compose up -d
+export PYTHONPATH=. && pytest tests -vv -s # 运行所有测试文件, -s 表示 print() 的内容也显示
+```
 
-   ```sh
-   cp env.sample .env
-   ```
+---
 
-2. 使用 Docker Compose 一键启动项目：
+## 一键部署 \[TODO\]
 
-   ```sh
-   docker compose up --build
-   ```
+```sh
+docker compose up --build
+```
 
 ---
 

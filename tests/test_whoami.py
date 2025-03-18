@@ -1,0 +1,9 @@
+import pytest
+
+
+@pytest.mark.run(order=1)
+@pytest.mark.asyncio
+async def test_whoami(client):
+    response = await client.get("/whoami")
+    assert response.status_code == 200
+    assert response.json() == {"whoami": "news-summary"}

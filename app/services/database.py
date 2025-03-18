@@ -4,14 +4,17 @@ from sqlalchemy.orm import DeclarativeBase
 from config import DATABASE_URL
 
 # 创建异步的 SQLAlchemy 引擎
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(
+    DATABASE_URL,
+    # echo=True,
+)
 AsyncSessionLocal = async_sessionmaker(engine)
 
 
 # 获取异步数据库会话
 async def get_db():
     async with AsyncSessionLocal() as session:
-        yield session
+        yield session  # 提供 session
 
 
 async def init_db():
