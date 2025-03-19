@@ -38,6 +38,8 @@ trio = "^0.29.0"
 asgi-lifespan = "^2.1.0"
 pytest-ordering = "^0.6"
 pytest-cov = "^6.0.0"
+pytest-async-sqlalchemy = "^0.2.0"
+gevent = "^24.11.1"
 
 [tool.black]
 line-length = 120
@@ -47,3 +49,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 filterwarnings = "ignore::DeprecationWarning"
 addopts = "--cov=app --cov-report=html --cov-report=xml"
+
+# https://stackoverflow.com/questions/68826941/python-coverage-for-async-methods
+[tool.coverage.run]
+concurrency = ["gevent"]

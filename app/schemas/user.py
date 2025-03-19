@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr, field_validator
 
 
@@ -46,6 +48,6 @@ class UserCreate(BaseModel):
 
 # 用户更新请求模型
 class UserUpdate(BaseModel):
-    username: str
-    email: str
-    password: str
+    username: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None

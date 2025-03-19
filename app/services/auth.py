@@ -11,10 +11,7 @@ from sqlalchemy.future import select
 
 from app.models.user import User
 from app.services.database import get_db
-
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from config import ALGORITHM, SECRET_KEY
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -93,7 +90,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     user = result.scalars().first()
 
     # 检查用户是否存在或未激活
-    if user is None or not user.is_active:
+    if user is None:
         raise credentials_exception
 
     return user

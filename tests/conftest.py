@@ -1,22 +1,37 @@
+import asyncio
+from datetime import datetime, timedelta, timezone
+
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from jose import jwt
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.pool import NullPool
 
 from app.main import app
 from app.services.database import Base, get_db
-from config import TEST_DATABASE_URL
+from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY, TEST_DATABASE_URL
 
 print(TEST_DATABASE_URL)
 # ✅ 创建 SQLAlchemy 异步引擎
 # https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#using-multiple-asyncio-event-loops
 test_engine = create_async_engine(
     TEST_DATABASE_URL,
-    poolclass=NullPool,
+    # poolclass=NullPool,
     # echo=True,
 )
 
 TestingSessionLocal = async_sessionmaker(bind=test_engine, class_=AsyncSession, expire_on_commit=False)
+
+
+# https://pypi.org/project/pytest-async-sqlalchemy/
+# or poolclass = NullPool when create_async_engine
+@pytest_asyncio.fixture(scope="session", autouse=True)
+def event_loop():
+    """
+    Creates an instance of the default event loop for the test session.
+    """
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
@@ -27,7 +42,6 @@ async def setup_database():
         print(f"\n创建所有表: {TEST_DATABASE_URL}")
     yield
     async with test_engine.begin() as conn:
-        __import__("pprint").pprint(Base.metadata.__dict__)
         print(f"\n丢弃所有表: {TEST_DATABASE_URL}")
         await conn.run_sync(Base.metadata.drop_all)
 
@@ -41,7 +55,22 @@ async def client():
 
     app.dependency_overrides[get_db] = override_get_db
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        print("\nstart client .....................")
         yield ac
-        print("\nend client .....................")
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope="function")
+def generate_token():
+    def _generate_token(current_user="new_user", token_type="valid_token"):
+
+        payload = {
+            "sub": current_user,
+            "exp": datetime.now(tz=timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        }
+        if token_type == "expired_token":
+            payload["exp"] = datetime.now(tz=timezone.utc) - timedelta(minutes=1)  # 生成过期 token
+        elif token_type == "invalid_token":
+            return "invalid.token.string"
+        return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+    return _generate_token
