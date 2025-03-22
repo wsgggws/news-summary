@@ -40,6 +40,7 @@ pytest-ordering = "^0.6"
 pytest-cov = "^6.0.0"
 pytest-async-sqlalchemy = "^0.2.0"
 gevent = "^24.11.1"
+isort = "^6.0.1"
 
 [tool.black]
 line-length = 120
