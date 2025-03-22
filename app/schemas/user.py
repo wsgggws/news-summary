@@ -1,20 +1,25 @@
+from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
+
+
+class UserBase(BaseModel):
+    """用户基类模型，提供复用的字段校验"""
+
+    username: Optional[str] = Field(
+        None, min_length=4, max_length=20, description="Username must be 4-20 characters long"
+    )
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    bio: Optional[str] = None
+    avatar: Optional[str] = None
+    favorite_sites: Optional[dict] = None
 
 
 # 用户注册请求模型
-class UserCreate(BaseModel):
-    username: str
-    email: EmailStr
-    password: str
-
-    @field_validator("username")
-    def validate_username(cls, value):
-        if not (4 <= len(value) <= 20):
-            raise ValueError("Password length must be between 4 to 20 characters long")
-        return value
-
+class UserCreate(UserBase):
     @field_validator("password")
     def validate_password(cls, value):
         """
@@ -47,7 +52,20 @@ class UserCreate(BaseModel):
 
 
 # 用户更新请求模型
-class UserUpdate(BaseModel):
-    username: Optional[str] = None
-    email: Optional[str] = None
-    password: Optional[str] = None
+class UserUpdate(UserBase):
+    pass
+
+
+class UserResponse(BaseModel):
+    id: UUID
+    username: str
+    email: str
+    last_login: Optional[datetime]
+    avatar: Optional[str]
+    bio: Optional[str]
+    favorite_sites: Optional[dict]
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True  # 允许 Pydantic 直接从 ORM 模型转换
