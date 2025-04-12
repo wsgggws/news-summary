@@ -18,6 +18,19 @@ dependencies = [
   "databases (>=0.9.0,<0.10.0)",
   "argon2-cffi (>=23.1.0,<24.0.0)",
   "passlib (>=1.7.4,<2.0.0)",
+  "celery (>=5.5.1,<6.0.0)",
+  "redis (>=5.2.1,<6.0.0)",
+  "aiohttp (>=3.11.16,<4.0.0)",
+  "opentelemetry-distro (>=0.53b0,<0.54)",
+  "opentelemetry-instrumentation-fastapi (==0.53b0)",
+  "opentelemetry-instrumentation-sqlalchemy (==0.53b0)",
+  "opentelemetry-instrumentation-asyncpg (==0.53b0)",
+  "opentelemetry-instrumentation-asyncio (==0.53b0)",
+  "opentelemetry-instrumentation-asgi (==0.53b0)",
+  "opentelemetry-instrumentation-logging (==0.53b0)",
+  "opentelemetry-api (>=1.32.0,<2.0.0)",
+  "opentelemetry-sdk (>=1.32.0,<2.0.0)",
+  "opentelemetry-exporter-otlp (>=1.32.0,<2.0.0)",
 ]
 
 
@@ -53,3 +66,4 @@ addopts = "--cov=app --cov-report=html --cov-report=xml"
 # https://stackoverflow.com/questions/68826941/python-coverage-for-async-methods
 [tool.coverage.run]
 concurrency = ["gevent"]
+omit = ["app/tracer.py"]
