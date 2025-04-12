@@ -21,3 +21,15 @@ the_second_user = {
         "Bilibili": "https://space.bilibili.com/472722204",
     },
 }
+
+the_third_user = {
+    "username": "rss_user",
+    "password": "Passw0rd;",
+    "email": "rss@example.com",
+    "bio": "可维护性",
+    "avatar": "https://avatars.githubusercontent.com/u/20469245?v=4",
+    "favorite_sites": {
+        "GitHub": "https://github.com/wsgggws",
+        "Bilibili": "https://space.bilibili.com/472722204",
+    },
+}

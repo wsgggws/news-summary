@@ -1,12 +1,14 @@
 import asyncio
+from datetime import datetime, timedelta, timezone
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from jose import jwt
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.main import app
 from app.services.database import Base, get_db
-from config import TEST_DATABASE_URL
+from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY, TEST_DATABASE_URL
 
 print(TEST_DATABASE_URL)
 # ✅ 创建 SQLAlchemy 异步引擎
@@ -55,3 +57,20 @@ async def client():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope="function")
+def generate_token():
+    def _generate_token(username="wsgggws", token_type="valid_token"):
+
+        payload = {
+            "sub": username,
+            "exp": datetime.now(tz=timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        }
+        if token_type == "expired_token":
+            payload["exp"] = datetime.now(tz=timezone.utc) - timedelta(minutes=1)  # 生成过期 token
+        elif token_type == "invalid_token":
+            return "invalid.token.string"
+        return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+    return _generate_token

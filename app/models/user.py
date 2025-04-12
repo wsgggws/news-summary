@@ -41,6 +41,11 @@ class User(Base):
         back_populates="followed",
         cascade="all, delete-orphan",
     )
+    rss_subscriptions = relationship(
+        "UserRSS",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
 
 
 class UserFollow(Base):

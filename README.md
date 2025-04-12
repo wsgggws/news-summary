@@ -21,8 +21,8 @@
 ## 🚀 **核心功能**
 
 - [x] 用户身份验证 & 登录
-- [x] Docker 一键启动
 - [x] 单元测试（Pytest）
+- [x] 新闻订阅
 - [ ] Dynaconf（配置管理）
 - [ ] 错误追踪 & 报警机制（Sentry + Prometheus + Grafana）
 - [ ] 新闻爬取 & 存储（asyncio + aiohttp + parsel）
@@ -30,6 +30,7 @@
 - [ ] 个性化推荐（TF-IDF / 余弦相似度）
 - [ ] API 限流 & 身份认证（JWT）
 - [ ] Redis 缓存（新闻数据与个性化推荐）
+- [ ] Docker 一键启动
 
 ---
 
@@ -46,7 +47,7 @@
 | **新闻爬取与解析** | Asyncio + aiohttp + parsel        |
 | **单元测试**       | Pytest                            |
 | **AI 组件**        | OpenAI GPT / Hugging Face（待定） |
-| **监控**           | Prometheus + Grafana              |
+| **监控**           | Opentelemetry + Grafana           |
 | **错误追踪**       | Sentry                            |
 | **API 认证**       | JWT（身份验证）                   |
 | **API 限流**       | SlowAPI（请求频率限制）           |
@@ -65,6 +66,26 @@ docker-compose up -d
 uvicorn app.main:app --reload
 ```
 
+<details>
+<summary>
+   Zero code opentelemetry-instrument 启动
+</summary>
+
+```sh
+# 注意不要使用 --reload 启动，不然没有 console 输出
+docker compose up -d
+set -a
+source .otel.env
+set +a
+opentelemetry-instrument uvicorn app.main:app
+```
+
+![metrics](./png/prometheus-metrics.png)
+![traces](./png/tempo-traces.png)
+![logs](./png/loki-logs.png)
+
+</details>
+
 ---
 
 ## 🧪 **测试**
@@ -74,14 +95,6 @@ pip install poetry==1.4.2
 poetry install
 docker-compose up -d
 export PYTHONPATH=. && pytest tests -vv -s # 运行所有测试文件, -s 表示 print() 的内容也显示
-```
-
----
-
-## 一键部署 \[TODO\]
-
-```sh
-docker compose up --build
 ```
 
 ---

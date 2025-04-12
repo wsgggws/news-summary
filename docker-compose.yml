@@ -36,7 +36,7 @@ services:
       timeout: 2s
       retries: 3
     networks:
-      - app-network
+      - otel-net
 
   test-db:
     image: postgres:13
@@ -55,7 +55,7 @@ services:
       timeout: 2s
       retries: 3
     networks:
-      - app-network
+      - otel-net
 
   # Redis 服务
   # redis:
@@ -126,45 +126,88 @@ services:
   #   networks:
   #     - app-network
 
-  # Prometheus 服务
-  # prometheus:
-  #   image: prom/prometheus:latest
-  #   container_name: news-summary-prometheus
-  #   ports:
-  #     - "9090:9090"
-  #   volumes:
-  #     - ./prometheus:/etc/prometheus # 挂载 Prometheus 配置文件
-  #   command:
-  #     - "--config.file=/etc/prometheus/prometheus.yml"
-  #   networks:
-  #     - app-network
-
   # Grafana 服务
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   container_name: news-summary-grafana
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #   environment:
-  #     GF_SECURITY_ADMIN_USER: admin
-  #     GF_SECURITY_ADMIN_PASSWORD: admin
-  #   depends_on:
-  #     - prometheus
-  #   networks:
-  #     - app-network
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    depends_on:
+      - otel-collector
+      - prometheus
+      - tempo
+      - loki
+    networks:
+      - otel-net
+
+  # otel 服务
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel/otel.yaml"]
+    volumes:
+      - ./config/otel/otel.yaml:/etc/otel/otel.yaml
+    ports:
+      - "4317:4317" # gRPC OTLP
+      - "9464:9464" # Prometheus Metrics
+    networks:
+      - otel-net
+
+  # Tempo 服务
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./config/tempo/tempo.yaml:/etc/tempo.yaml
+      - tempo_data:/tmp/tempo
+    ports:
+      - "3200:3200" # Tempo HTTP API
+    networks:
+      - otel-net
+
+  # Prometheus 服务
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+    networks:
+      - otel-net
+
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: loki
+    volumes:
+      # 这里注释掉，用默认的配置
+      # - ./config/loki/loki.yaml:/etc/loki/config.yaml
+      - loki_data:/tmp/loki
+    ports:
+      - "3100:3100"
+    networks:
+      - otel-net
 
 # 定义卷
 volumes:
   postgres_data:
   postgres_test_data:
+  grafana_data:
+  tempo_data:
+  loki_data:
   # redis_data:
   # sentry_postgres_data:
   # sentry_redis_data:
-  # grafana_data:
 
 # 定义网络
 networks:
-  app-network:
+  otel-net:
     driver: bridge
