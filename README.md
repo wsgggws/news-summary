@@ -1,5 +1,6 @@
 # 📰 News-Summary
 
+![CI](https://github.com/wsgggws/news-summary/actions/workflows/ci.yml/badge.svg)
 [![Codecov](https://codecov.io/gh/wsgggws/news-summary/branch/main/graph/badge.svg)](https://codecov.io/gh/wsgggws/news-summary)
 
 **AI 生成个性化新闻摘要**，并将在 [Bilibili](https://space.bilibili.com/472722204?spm_id_from=333.1007.0.0) 上进行分享，敬请期待！🚀
@@ -23,9 +24,12 @@
 - [x] 用户身份验证 & 登录
 - [x] 单元测试（Pytest）
 - [x] 新闻订阅
-- [ ] Dynaconf（配置管理）
-- [ ] 错误追踪 & 报警机制（Sentry + Prometheus + Grafana）
+- [x] 监控 Metrics（OpenTelemetry + otel-collector + Prometheus + Grafana）
+- [x] 监控 Traces（OpenTelemetry + otel-collector + Tempo + Grafana）
+- [x] 监控 Logs（OpenTelemetry + otel-collector + Loki + Grafana）
+- [x] pydantic-settings（配置管理）
 - [ ] 新闻爬取 & 存储（asyncio + aiohttp + parsel）
+- [ ] 错误追踪 （Sentry ）
 - [ ] AI 生成摘要（GPT / Hugging Face）
 - [ ] 个性化推荐（TF-IDF / 余弦相似度）
 - [ ] API 限流 & 身份认证（JWT）
@@ -36,23 +40,24 @@
 
 ## 🛠 **技术栈**
 
-| **技术**           | **描述**                          |
-| ------------------ | --------------------------------- |
-| **开发语言**       | Python 3.11                       |
-| **包管理**         | Poetry 2.1.0                      |
-| **后端框架**       | FastAPI                           |
-| **数据库**         | PostgreSQL + SQLAlchemy（ORM）    |
-| **任务队列**       | Celery + aioredis（异步任务处理） |
-| **配置管理**       | Dynaconf                          |
-| **新闻爬取与解析** | Asyncio + aiohttp + parsel        |
-| **单元测试**       | Pytest                            |
-| **AI 组件**        | OpenAI GPT / Hugging Face（待定） |
-| **监控**           | Opentelemetry + Grafana           |
-| **错误追踪**       | Sentry                            |
-| **API 认证**       | JWT（身份验证）                   |
-| **API 限流**       | SlowAPI（请求频率限制）           |
-| **日志管理**       | Loguru + Loki                     |
-| **部署方式**       | Docker Compose                    |
+| **技术**           | **描述**                                              |
+| ------------------ | ----------------------------------------------------- |
+| **开发语言**       | Python 3.11                                           |
+| **包管理**         | Poetry 2.1.0                                          |
+| **后端框架**       | FastAPI                                               |
+| **数据库**         | PostgreSQL + SQLAlchemy（ORM）                        |
+| **任务队列**       | Celery + aioredis（异步任务处理）                     |
+| **配置管理**       | pydantic-settings                                     |
+| **新闻爬取与解析** | Asyncio + aiohttp + parsel                            |
+| **单元测试**       | Pytest                                                |
+| **AI 组件**        | TODO                                                  |
+| **监控 Metrics**   | OpenTelemetry + otel-collector + Prometheus + Grafana |
+| **监控 Traces**    | OpenTelemetry + otel-collector + Tempo + Grafana      |
+| **监控 Logs**      | OpenTelemetry + otel-collector + Loki + Grafana       |
+| **错误追踪**       | Sentry                                                |
+| **API 认证**       | JWT（身份验证）                                       |
+| **API 限流**       | SlowAPI（请求频率限制）                               |
+| **部署方式**       | Docker Compose                                        |
 
 ---
 
@@ -94,7 +99,7 @@ opentelemetry-instrument uvicorn app.main:app
 pip install poetry==1.4.2
 poetry install
 docker-compose up -d
-export PYTHONPATH=. && pytest tests -vv -s # 运行所有测试文件, -s 表示 print() 的内容也显示
+export PYTHONPATH=.; export APP_ENV=ci; pytest tests -vv -s # 运行所有测试文件, -s 表示 print() 的内容也显示
 ```
 
 ---
