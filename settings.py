@@ -15,7 +15,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost:5432/newsdb"
 
     model_config = SettingsConfigDict(
-        env_file=Path(f".env.{os.getenv('APP_ENV', 'local')}"),
+        env_file=[
+            Path(".env"),
+            Path(f".env.{os.getenv('APP_ENV', 'local')}"),
+        ],
         env_file_encoding="utf-8",
         extra="ignore",  # 忽略未知变量
     )

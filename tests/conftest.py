@@ -6,7 +6,7 @@ from httpx import ASGITransport, AsyncClient
 from jose import jwt
 
 from app.main import app
-from app.services.database import AsyncSession, Base, engine, get_db
+from app.services.database import Base, engine
 from settings import settings
 
 assert settings.APP_ENV == "ci"
@@ -47,7 +47,6 @@ async def client():
 @pytest_asyncio.fixture(scope="function")
 def generate_token():
     def _generate_token(username="wsgggws", token_type="valid_token"):
-
         payload = {
             "sub": username,
             "exp": datetime.now(tz=timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
