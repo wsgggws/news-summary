@@ -1,19 +1,19 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-from config import DATABASE_URL
+from settings import settings
 
 # 创建异步的 SQLAlchemy 引擎
 engine = create_async_engine(
-    DATABASE_URL,
+    settings.DATABASE_URL,
     # echo=True,
 )
-AsyncSessionLocal = async_sessionmaker(engine)
+AsyncSession = async_sessionmaker(engine)
 
 
 # 获取异步数据库会话
 async def get_db():
-    async with AsyncSessionLocal() as session:
+    async with AsyncSession() as session:
         yield session  # 提供 session
 
 

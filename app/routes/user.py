@@ -6,16 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
-from app.services.auth import (
-    Token,
-    authenticate_user,
-    create_access_token,
-    get_current_user,
-    get_password_hash,
-)
+from app.services.auth import Token, authenticate_user, create_access_token, get_current_user, get_password_hash
 from app.services.database import get_db
 from app.utils.db import commit_db
-from config import ACCESS_TOKEN_EXPIRE_MINUTES
+from settings import settings
 
 router = APIRouter(prefix="/api/v1/user")
 
@@ -55,7 +49,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
 
     # 生成访问令牌
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
 
     # 更新用户最后登录时间和激活状态
