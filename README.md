@@ -43,7 +43,7 @@
 | **技术**           | **描述**                                              |
 | ------------------ | ----------------------------------------------------- |
 | **开发语言**       | Python 3.11                                           |
-| **包管理**         | Poetry 2.1.0                                          |
+| **包管理**         | Poetry 2.1.2                                          |
 | **后端框架**       | FastAPI                                               |
 | **数据库**         | PostgreSQL + SQLAlchemy（ORM）                        |
 | **任务队列**       | Celery + aioredis（异步任务处理）                     |
@@ -61,13 +61,29 @@
 
 ---
 
+## 环境安装
+
+### Python3.11
+
+推荐使用 [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/main) 进行虚拟环境管理
+
+### [Poetry](https://python-poetry.org/docs/)
+
+```sh
+curl -sSL https://install.python-poetry.org | python3 - --version 2.1.2
+```
+
+---
+
 ## 🚀 **如何本地运行**
 
 ```sh
-pip install poetry==1.4.2
-poetry install
-cp env.sample .env
-docker-compose up -d
+# 目前只依赖 pg 数据库
+docker compose down
+docker compose up db -d
+set -a
+source .env.local
+set +a
 uvicorn app.main:app --reload
 ```
 
@@ -77,9 +93,11 @@ uvicorn app.main:app --reload
 </summary>
 
 ```sh
-# 注意不要使用 --reload 启动，不然没有 console 输出
+# 注意不要使用 --reload 启动，不然没有 console 输出, 这里简单起见，起了所有的 docker images
+docker compose down
 docker compose up -d
 set -a
+source .env.local
 source .otel.env
 set +a
 opentelemetry-instrument uvicorn app.main:app
@@ -96,10 +114,12 @@ opentelemetry-instrument uvicorn app.main:app
 ## 🧪 **测试**
 
 ```sh
-pip install poetry==1.4.2
-poetry install
-docker-compose up -d
-export PYTHONPATH=.; export APP_ENV=ci; pytest tests -vv -s # 运行所有测试文件, -s 表示 print() 的内容也显示
+docker compose down
+docker compose up test-db -d
+set -a
+source .env.ci
+set +a
+pytest tests -vv -s # 运行所有测试文件, -s 表示 print() 的内容也显示
 ```
 
 ---

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, status
-from fastapi.exceptions import HTTPException, RequestValidationError
+from fastapi.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
 
