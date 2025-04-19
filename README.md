@@ -78,29 +78,17 @@ curl -sSL https://install.python-poetry.org | python3 - --version 2.1.2
 ## 🚀 **如何本地运行**
 
 ```sh
-# 目前只依赖 pg 数据库
-docker compose down
-docker compose up db -d
-set -a
-source .env.local
-set +a
-uvicorn app.main:app --reload
+make run
 ```
 
 <details>
 <summary>
-   Zero code opentelemetry-instrument 启动
+OpenTelemetry-Instrument 启动, 并观测 Metrics, Traces, Logs
 </summary>
 
 ```sh
-# 注意不要使用 --reload 启动，不然没有 console 输出, 这里简单起见，起了所有的 docker images
-docker compose down
-docker compose up -d
-set -a
-source .env.local
-source .otel.env
-set +a
-opentelemetry-instrument uvicorn app.main:app
+# 注意没有也不建议使用 --reload 启动
+make otel-run
 ```
 
 ![metrics](./png/prometheus-metrics.png)
@@ -114,12 +102,9 @@ opentelemetry-instrument uvicorn app.main:app
 ## 🧪 **测试**
 
 ```sh
-docker compose down
-docker compose up test-db -d
-set -a
-source .env.ci
-set +a
-pytest tests -vv -s # 运行所有测试文件, -s 表示 print() 的内容也显示
+make test # 运行所有测试文件
+make test ARGS="-vv -s" # 运行所有测试文件, -s 表示 print() 的内容也显示
+make test ARGS="tests/test_whoami -vv -s" # 运行单个文件, 并显示输出
 ```
 
 ---
