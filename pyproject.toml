@@ -57,7 +57,12 @@ gevent = "^24.11.1"
 [tool.ruff]
 target-version = "py311"
 line-length = 120
-show-fixes = true
+indent-width = 4
+fix = true
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+unfixable = []
 
 [tool.ruff.format]
 quote-style = "double"
