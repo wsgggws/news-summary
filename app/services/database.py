@@ -3,10 +3,14 @@ from sqlalchemy.orm import DeclarativeBase
 
 from settings import settings
 
-# 创建异步的 SQLAlchemy 引擎
+# 创建异步的 SQLAlchemy 引擎, 默认是开启连接池的，这里更@GPT改了些参数
 engine = create_async_engine(
     settings.DATABASE_URL,
-    # echo=True,
+    pool_size=settings.DB_POOL_SIZE,
+    max_overflow=settings.DB_MAX_OVERFLOW,
+    pool_timeout=settings.DB_POOL_TIMEOUT,
+    pool_recycle=settings.DB_POOL_RECYCLE,
+    pool_pre_ping=settings.DB_POOL_PRE_PING,
 )
 AsyncSession = async_sessionmaker(engine)
 
