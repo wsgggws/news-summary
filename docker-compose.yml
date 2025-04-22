@@ -58,13 +58,16 @@ services:
       - otel-net
 
   # Redis 服务
-  # redis:
-  #   image: redis:6
-  #   container_name: news-summary-redis
-  #   volumes:
-  #     - redis_data:/data
-  #   networks:
-  #     - app-network
+  redis:
+    image: redis:6.2
+    container_name: news-summary-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass mypassword
+    volumes:
+      - redis_data:/data
+    networks:
+      - otel-net
 
   # Celery 服务
   # celery:
@@ -72,14 +75,14 @@ services:
   #     context: . # 使用与 web 相同的 Dockerfile
   #     dockerfile: Dockerfile
   #   container_name: news-summary-celery
-  #   command: celery -A app.tasks.celery_app worker --loglevel=info
+  #   command: celery -A app.services.celery_app worker --loglevel=info
   #   env_file:
   #     - .env
   #   depends_on:
   #     - db
   #     - redis
   #   networks:
-  #     - app-network
+  #     - otel-net
 
   # Sentry 服务
   # sentry:
@@ -195,6 +198,42 @@ services:
       - "3100:3100"
     networks:
       - otel-net
+  ollama-init:
+    image: ollama/ollama
+    container_name: ollama-init
+    entrypoint: ["sh", "-c"]
+    # command: ["ollama serve & sleep 3 && ollama pull llama3:8b"]
+    # command: ["ollama serve & sleep 3 && ollama pull tinyllama"]
+    # command: ["ollama serve & sleep 3 && ollama pull gemma2:2b"]
+    command: ["ollama serve & sleep 3 && ollama pull qwen:1.8b"]
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=/root/.ollama
+    networks:
+      - otel-net
+    restart: "no"
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    depends_on:
+      ollama-init:
+        condition: service_completed_successfully
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MODELS=/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - otel-net
 
 # 定义卷
 volumes:
@@ -203,7 +242,8 @@ volumes:
   grafana_data:
   tempo_data:
   loki_data:
-  # redis_data:
+  redis_data:
+  ollama_data:
   # sentry_postgres_data:
   # sentry_redis_data:
 

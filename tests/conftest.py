@@ -10,7 +10,7 @@ from app.services.database import Base, engine
 from settings import settings
 
 assert settings.APP_ENV == "ci"
-assert settings.DATABASE_URL.endswith("test_newsdb")
+assert settings.db.URL.endswith("test_newsdb")
 
 
 # https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#using-multiple-asyncio-event-loops
@@ -31,10 +31,10 @@ async def setup_database():
     """全局数据库初始化（整个测试会话只执行一次）"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        print(f"\n创建所有表: {settings.DATABASE_URL}")
+        print(f"\n创建所有表: {settings.db.URL}")
     yield
     async with engine.begin() as conn:
-        print(f"\n丢弃所有表: {settings.DATABASE_URL}")
+        print(f"\n丢弃所有表: {settings.db.URL}")
         await conn.run_sync(Base.metadata.drop_all)
 
 
