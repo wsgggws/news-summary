@@ -28,9 +28,9 @@
 - [x] 监控 Traces（OpenTelemetry + otel-collector + Tempo + Grafana）
 - [x] 监控 Logs（OpenTelemetry + otel-collector + Loki + Grafana）
 - [x] pydantic-settings（配置管理）
-- [ ] 新闻爬取 & 存储（asyncio + aiohttp + parsel）
+- [x] 新闻爬取 & 存储（Celery + asyncio + aiohttp + parsel）
+- [ ] AI 生成摘要（ollama or OpenAPI）
 - [ ] 错误追踪 （Sentry ）
-- [ ] AI 生成摘要（GPT / Hugging Face）
 - [ ] 个性化推荐（TF-IDF / 余弦相似度）
 - [ ] API 限流 & 身份认证（JWT）
 - [ ] Redis 缓存（新闻数据与个性化推荐）

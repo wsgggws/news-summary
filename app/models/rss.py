@@ -5,6 +5,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.models.user import User  # noqa
 from app.services.database import Base
 
 
@@ -43,10 +44,11 @@ class RSSArticle(Base):
     rss_id: Mapped[UUID] = mapped_column(ForeignKey("rss_feed.id", ondelete="CASCADE"))
     title: Mapped[str] = mapped_column(String, nullable=False)
     link: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    description: Mapped[str | None] = mapped_column(Text, comment="Original description from RSS feed")
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    content_raw: Mapped[str | None] = mapped_column(Text)
-    content_text: Mapped[str | None] = mapped_column(Text)
-    summary: Mapped[str | None] = mapped_column(Text)
+    article_html: Mapped[str | None] = mapped_column(Text, comment="Full article content in HTML format")
+    article_md: Mapped[str | None] = mapped_column(Text, comment="Full article content in Markdown format")
+    summary_md: Mapped[str | None] = mapped_column(Text, comment="Article summary in Markdown format")
     is_new: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 

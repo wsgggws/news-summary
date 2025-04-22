@@ -9,13 +9,21 @@ set -euo pipefail
 echo "📦 关闭旧容器..."
 docker compose down
 
-echo "🐘 启动 PostgreSQL db 数据库..."
-docker compose up -d db
+# echo "🐘 启动 DB, Redis, ollama..."
+# docker compose up -d db redis ollama
+echo "🐘 启动 DB, Redis..."
+docker compose up -d db redis
 
 echo "📦 加载环境变量..."
 set -a
 source .env.local
 set +a
+
+echo "🚀 nohub 启动 celery worker ..."
+nohup celery -A celery_app beat --loglevel=info 2>&1 &
+
+nohup celery -A celery_app worker --pool=threads --concurrency=1 --loglevel=info 2>&1 &
+nohup celery -A celery_app worker --pool=threads --concurrency=1 --loglevel=info 2>&1 &
 
 echo "🚀 启动 FastAPI 开发服务..."
 uvicorn app.main:app --reload

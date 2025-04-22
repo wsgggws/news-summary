@@ -32,6 +32,9 @@ dependencies = [
   "opentelemetry-sdk (>=1.32.0,<2.0.0)",
   "opentelemetry-exporter-otlp (>=1.32.0,<2.0.0)",
   "pydantic-settings (>=2.9.1,<3.0.0)",
+  "parsel (>=1.10.0,<2.0.0)",
+  "feedparser (>=6.0.11,<7.0.0)",
+  "html2text (>=2025.4.15,<2026.0.0)",
 ]
 
 
@@ -53,6 +56,7 @@ asgi-lifespan = "^2.1.0"
 pytest-cov = "^6.0.0"
 pytest-async-sqlalchemy = "^0.2.0"
 gevent = "^24.11.1"
+pytest-recording = "^0.13.2"
 
 [tool.ruff]
 target-version = "py311"
@@ -62,18 +66,19 @@ fix = true
 
 [tool.ruff.lint]
 fixable = ["ALL"]
-unfixable = []
+extend-select = ["I", "E", "F"]
+ignore = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 
 [tool.pytest.ini_options]
+
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = "ignore::DeprecationWarning"
-addopts = "--cov=app --cov-report=html --cov-report=xml"
-
+addopts = "--cov=app --cov=celery_app --cov-report=html --cov-report=xml"
 # https://stackoverflow.com/questions/68826941/python-coverage-for-async-methods
 [tool.coverage.run]
 concurrency = ["gevent"]

@@ -17,11 +17,13 @@ repos:
       - id: check-case-conflict
       - id: check-json
       - id: check-xml
+        exclude: ^(tests/data/feed/.*\.xml|tests/data/cassettes/.*\.yaml)$
       - id: check-executables-have-shebangs
       - id: check-toml
       - id: check-yaml
         args: ["--unsafe"] # 允许 YAML 解析 tuple
       - id: check-added-large-files
+        exclude: ^tests/data/cassettes/.*\.yaml$
       - id: check-symlinks
       - id: debug-statements
       - id: end-of-file-fixer

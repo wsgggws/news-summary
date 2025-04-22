@@ -33,3 +33,16 @@ the_third_user = {
         "Bilibili": "https://space.bilibili.com/472722204",
     },
 }
+
+test_feeds = [
+    {
+        "id": "185d3af8-03f3-45c3-a39f-83aa85a46b94",
+        "url": "https://www.ruanyifeng.com/blog/atom.xml",
+        "title": "阮一峰日志",
+    },
+    {
+        "id": "a691b22e-b31e-4f5d-83d4-44d56c2f8712",
+        "url": "https://weekly.tw93.fun/rss.xml",
+        "title": "潮流周刊",
+    },
+]

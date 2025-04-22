@@ -21,6 +21,8 @@ async def subscribe_rss(
     user: User = Depends(get_current_user),
 ):
     user_id = user.id
+    # TODO 是不是有效的 Feed url
+    # TODO 用户订阅的频率限制
     # 检查 RSSFeed 是否已存在
     result = await db.execute(select(RSSFeed).where(RSSFeed.url == str(data.url)))
     rss = result.scalar_one_or_none()
