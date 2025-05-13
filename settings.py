@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -34,6 +35,22 @@ class RedisSettings(BaseSettings):
     )
 
 
+class AISettings(BaseSettings):
+    BASE_URL: str = "https://api.deepseek.com"
+    API_KEY: Optional[str]
+    MODEL: str = "deepseek-chat"
+    # MODEL: str = "qwen:1.8b"
+    MAX_TOKENS: int = 4096
+    TEMPERATURE: float = 0.1
+
+    model_config = SettingsConfigDict(
+        env_file=(".env", f".env.{os.getenv('APP_ENV', 'local')}"),
+        env_file_encoding="utf8",
+        extra="ignore",
+        env_prefix="LLM_",
+    )
+
+
 class Settings(BaseSettings):
     APP_ENV: str = "local"
 
@@ -45,6 +62,7 @@ class Settings(BaseSettings):
 
     db: PostgresSettings = PostgresSettings()
     redis: RedisSettings = RedisSettings()
+    ai: AISettings = AISettings()
 
     # TODO, 这里还需要查文档，如何避免重复配置变量
     model_config = SettingsConfigDict(
