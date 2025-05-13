@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from dateutil.tz import tzutc
 
 from celery_app.tasks.rss_crawler import enhance_articles, parse_feed
@@ -63,7 +64,9 @@ def test_parse_feed_with_rss():
         ]
 
 
-def test_enhence_articles_case1():
+@pytest.mark.vcr()
+@pytest.mark.asyncio
+async def test_enhence_articles_case1():
     with open("tests/data/articles/阮一峰的网络日志/source.html") as f:
         html = f.read()
 
@@ -72,7 +75,7 @@ def test_enhence_articles_case1():
             "article_html": html,
         }
     ]
-    articles = enhance_articles(articles)
+    articles = await enhance_articles(articles)
     assert "article_md" in articles[0]
     assert "summary_md" in articles[0]
     # could see example at source.md(html 到 markdown 的转换结果) summary.md(调用 AI 模型的总结)

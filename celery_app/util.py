@@ -1,8 +1,12 @@
+import logging
+
 from dateutil import parser as date_parser
 from parsel import Selector
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from settings import settings
+
+logger = logging.getLogger(__name__)
 
 
 def get_celery_async_session():
@@ -25,7 +29,7 @@ def parse_date(date_str: str = ""):
         # feedparser 的 parsed_parsed 不一定有 → 使用 dateutil 兜底
         return date_parser.parse(date_str)
     except Exception as e:
-        print(f"Failed to parse date: {date_str}, error: {e}")
+        logger.error(f"Failed to parse date: {date_str}, error: {e}")
         return None
 
 

@@ -29,7 +29,7 @@
 - [x] 监控 Logs（OpenTelemetry + otel-collector + Loki + Grafana）
 - [x] pydantic-settings（配置管理）
 - [x] 新闻爬取 & 存储（Celery + asyncio + aiohttp + parsel）
-- [ ] AI 生成摘要（ollama or OpenAPI）
+- [x] AI 生成摘要（DeepSeek API）
 - [ ] 错误追踪 （Sentry ）
 - [ ] 个性化推荐（TF-IDF / 余弦相似度）
 - [ ] API 限流 & 身份认证（JWT）
@@ -76,6 +76,8 @@ curl -sSL https://install.python-poetry.org | python3 - --version 2.1.2
 ---
 
 ## 🚀 **如何本地运行**
+
+由于会使用到 AI 功能，可在 .env 文件里添加 LLM_API_KEY, 否则订阅的总结(summary_md) 字段将不会有内容生成, 其它功能正常
 
 ```sh
 make run

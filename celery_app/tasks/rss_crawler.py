@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from typing import Dict, List
 
 import aiohttp
@@ -10,9 +9,9 @@ from sqlalchemy.future import select
 
 from app.models.rss import RSSArticle
 from celery_app import celery_app
-from celery_app.util import get_celery_async_session, parse_date, parse_description
-
-logger = logging.getLogger(__name__)
+from celery_app.llm import async_chat
+from celery_app.util import get_celery_async_session, logger, parse_date, parse_description
+from settings import settings
 
 
 @celery_app.task
@@ -35,7 +34,7 @@ async def do_one_feed_logic(rss_id: str, url: str):
         logger.info(f"Found {len(entries)} new entries to process")
 
         articles = await fetch_articles(entries)
-        articles = enhance_articles(articles)  # Use corrected function name
+        articles = await enhance_articles(articles)
         await save_articles_to_db(rss_id, articles)
     except Exception as e:
         logger.error(f"Error in do_one_feed_logic for {rss_id} ({url}): {e}")
@@ -44,11 +43,15 @@ async def do_one_feed_logic(rss_id: str, url: str):
         logger.info(f"successful do_one_feed_logic for {rss_id} ({url})")
 
 
-def enhance_articles(articles: List[Dict]) -> List[Dict]:
+async def enhance_articles(articles: List[Dict]) -> List[Dict]:
     for article in articles:
         html = article.get("article_html") or ""
-        article["article_md"] = html2text.html2text(html)
-        article["summary_md"] = "# TODO 接下来会实现"
+        markdown = html2text.html2text(html)
+        article["article_md"] = markdown
+        if not settings.ai.API_KEY:
+            article["summary_md"] = "# TODO"
+        else:
+            article["summary_md"] = await async_chat(content=markdown)
     return articles
 
 
