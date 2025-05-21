@@ -31,6 +31,16 @@ class RSSSubscribeRepeatException(HTTPException):
         )
 
 
+class RSSInvalidException(HTTPException):
+    """订阅链接无效"""
+
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="RSS is invalid.",
+        )
+
+
 class RSSNotFoundException(HTTPException):
     """订阅不存在"""
 

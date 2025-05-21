@@ -23,14 +23,3 @@ async def async_test_db():
         await async_session.refresh(feed1)
         await async_session.refresh(feed2)
     yield
-
-
-@pytest.fixture(scope="module")
-def vcr_config():
-    return {
-        # Replace the Authorization request header with "DUMMY" in cassettes
-        "filter_headers": [("authorization", "DUMMY")],
-        "cassette_library_dir": "tests/data/cassettes",
-        "decode_compressed_response": True,
-        "log": None,
-    }

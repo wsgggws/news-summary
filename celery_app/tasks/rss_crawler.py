@@ -4,6 +4,7 @@ from typing import Dict, List
 import aiohttp
 import feedparser
 import html2text
+from aiohttp.client import ClientTimeout
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 
@@ -101,7 +102,7 @@ async def _async_download(entry, session, semaphore):
     async with semaphore:
         url = entry.get("link") or ""
         try:
-            async with session.get(url, timeout=30) as response:
+            async with session.get(url, timeout=ClientTimeout(total=settings.RSS_TIMEOUT)) as response:
                 if response.status == 200:
                     entry["article_html"] = await response.text()
                 else:
