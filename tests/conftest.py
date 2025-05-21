@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 
+import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from jose import jwt
@@ -58,3 +59,14 @@ def generate_token():
         return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
     return _generate_token
+
+
+@pytest.fixture(scope="session")
+def vcr_config():
+    return {
+        # Replace the Authorization request header with "DUMMY" in cassettes
+        "filter_headers": [("authorization", "DUMMY")],
+        "cassette_library_dir": "tests/data/cassettes",
+        "decode_compressed_response": True,
+        "log": None,
+    }

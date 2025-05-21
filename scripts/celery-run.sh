@@ -6,9 +6,6 @@
 # 这是一个业界常见的“安全模式”（strict mode），能让脚本在出现问题时尽早失败，避免隐式地继续往下执行出更难排查的错误
 set -euo pipefail
 
-echo "📦 关闭旧容器..."
-docker compose down
-
 echo "🐘 启动 DB, Redis..."
 docker compose up -d db redis
 
@@ -17,5 +14,10 @@ set -a
 source .env.local
 set +a
 
-echo "🚀 启动 FastAPI 开发服务..."
-uvicorn app.main:app --reload
+echo "🚀 nohub 启动 celery beat, worker ..."
+nohup celery -A celery_app beat --loglevel=info 2>&1 &
+
+nohup celery -A celery_app worker --pool=threads --concurrency=1 --loglevel=info 2>&1 &
+nohup celery -A celery_app worker --pool=threads --concurrency=1 --loglevel=info 2>&1 &
+
+tail -f nohup.out
