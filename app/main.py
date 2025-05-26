@@ -47,7 +47,6 @@ logger = logging.getLogger(__name__)
 
 @app.get("/whoami")
 async def root():
-    logger.info("test otel logs to grafana")
     return {"whoami": "news-summary"}
 
 
