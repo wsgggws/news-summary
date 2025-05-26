@@ -13,6 +13,7 @@ def setup_middlewares(app):
 
     origins = [
         "http://localhost:5173",
+        "https://news-summary-front.onrender.com",
     ]
 
     app.add_middleware(

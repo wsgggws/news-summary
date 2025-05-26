@@ -21,6 +21,7 @@ class PostgresSettings(BaseSettings):
 
 
 class RedisSettings(BaseSettings):
+    NEED_PASSWORD: bool = True
     PASSWORD: str = "mypassword"
     HOST: str = "localhost"
     PORT: int = 6379
