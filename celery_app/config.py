@@ -21,7 +21,7 @@ enable_utc = False
 beat_schedule = {
     "dispatch_rss_fetch": {
         "task": "celery_app.tasks.rss_dispatcher.dispatch_all_feeds",
-        "schedule": crontab(minute="*/2"),  # 每2分钟执行
+        "schedule": crontab(minute=f"*/{settings.CELERY_BEAT_MINUTES}"),  # 每2分钟执行
         "args": (),
     },
 }
