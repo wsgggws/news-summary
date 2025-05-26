@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     RSS_TIMEOUT: float = 15.0
     RSS_LIMITER: int = 3
     RSS_TIME_UNIT: str = "minute"
+    CELERY_BEAT_MINUTES: int = 10
 
     db: PostgresSettings = PostgresSettings()
     redis: RedisSettings = RedisSettings()
