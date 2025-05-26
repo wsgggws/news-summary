@@ -63,7 +63,7 @@ services:
     container_name: news-summary-redis
     ports:
       - "6379:6379"
-    command: redis-server --requirepass mypassword
+    command: redis-server
     volumes:
       - redis_data:/data
     networks:

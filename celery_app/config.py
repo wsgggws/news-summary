@@ -1,18 +1,9 @@
-from urllib.parse import quote_plus
-
 from celery.schedules import crontab
 
 from settings import settings
 
-if settings.redis.NEED_PASSWORD:
-    passwd = quote_plus(settings.redis.PASSWORD or "")
-    # Broker 配置（任务队列）
-    broker_url = f"redis://:{passwd}@{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BROKER_NUM}"
-    # 结果存储（任务执行结果）
-    result_backend = f"redis://:{passwd}@{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BACKEND_NUM}"
-else:
-    broker_url = f"redis://{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BROKER_NUM}"
-    result_backend = f"redis://{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BACKEND_NUM}"
+broker_url = f"redis://{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BROKER_NUM}"
+result_backend = f"redis://{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BACKEND_NUM}"
 
 # 指定任务序列化方式
 task_serializer = "json"
