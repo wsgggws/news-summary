@@ -3,7 +3,7 @@
 ![CI](https://github.com/wsgggws/news-summary/actions/workflows/ci.yml/badge.svg)
 [![Codecov](https://codecov.io/gh/wsgggws/news-summary/branch/main/graph/badge.svg)](https://codecov.io/gh/wsgggws/news-summary)
 
-**AI 生成个性化新闻摘要**，并将在 [Bilibili](https://space.bilibili.com/472722204?spm_id_from=333.1007.0.0) 上进行分享，敬请期待！🚀
+**AI 生成个性化新闻摘要**，并在 [Bilibili](https://space.bilibili.com/472722204?spm_id_from=333.1007.0.0) 有合集分享，敬请期待！🚀
 
 ## 前端项目地址
 
@@ -69,7 +69,7 @@
 
 ### Python3.11
 
-推荐使用 [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/main) 进行虚拟环境管理
+推荐使用 [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/main) 进行 Python 版本管理
 
 ### [Poetry](https://python-poetry.org/docs/)
 
@@ -81,10 +81,23 @@ curl -sSL https://install.python-poetry.org | python3 - --version 2.1.2
 
 ## 🚀 **如何本地运行**
 
-由于会使用到 AI 功能，可在 .env 文件里添加 LLM_API_KEY, 否则订阅的总结(summary_md) 字段将不会有内容生成, 其它功能正常
+```sh
+# 启动 WebAPI
+make run
+```
 
 ```sh
-make run
+# 启动 Celery beat and 2 workers
+make celery-run
+```
+
+由于会使用到 AI 功能，可在 .env 文件里添加相关环境变量，
+否则订阅的总结(summary_md) 字段将不会有内容生成, 其它功能正常
+
+```.env
+LLM_API_KEY="XXX"
+LLM_BASE_URL="https://xxx"
+LLM_MODEL="YYY"
 ```
 
 <details>

@@ -9,13 +9,16 @@ class UserBase(BaseModel):
     """用户基类模型，提供复用的字段校验"""
 
     username: Optional[str] = Field(
-        None, min_length=4, max_length=20, description="Username must be 4-20 characters long"
+        None,
+        min_length=4,
+        max_length=20,
+        description="用户名, 长度必须为4-20个字符 (Username must be 4-20 characters long)",
     )
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
-    bio: Optional[str] = None
-    avatar: Optional[str] = None
-    favorite_sites: Optional[dict] = None
+    email: Optional[EmailStr] = Field(None, description="用户邮箱")
+    password: Optional[str] = Field(None, description="用户密码 (注册和更新时使用)")
+    bio: Optional[str] = Field(None, description="用户个人简介")
+    avatar: Optional[str] = Field(None, description="用户头像链接")
+    favorite_sites: Optional[dict] = Field(None, description="用户收藏的站点列表")
 
 
 # 用户注册请求模型
@@ -57,15 +60,15 @@ class UserUpdate(UserBase):
 
 
 class UserResponse(BaseModel):
-    id: UUID
-    username: str
-    email: str
-    last_login: Optional[datetime]
-    avatar: Optional[str]
-    bio: Optional[str]
-    favorite_sites: Optional[dict]
-    created_at: datetime
-    updated_at: datetime
+    id: UUID = Field(description="用户唯一标识符")
+    username: str = Field(description="用户名")
+    email: str = Field(description="用户邮箱")
+    last_login: Optional[datetime] = Field(None, description="上次登录时间")
+    avatar: Optional[str] = Field(None, description="用户头像链接")
+    bio: Optional[str] = Field(None, description="用户个人简介")
+    favorite_sites: Optional[dict] = Field(None, description="用户收藏的站点列表")
+    created_at: datetime = Field(description="用户创建时间")
+    updated_at: datetime = Field(description="用户更新时间")
 
     class Config:
         from_attributes = True  # 允许 Pydantic 直接从 ORM 模型转换
