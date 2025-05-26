@@ -25,6 +25,7 @@ async def subscribe_rss(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """订阅一个新的RSS源"""
     user_id = user.id
     # 检查 RSSFeed 是否已存在
     result = await db.execute(select(RSSFeed).where(RSSFeed.url == str(data.url)))
@@ -66,6 +67,7 @@ async def get_subscriptions(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """获取当前用户已订阅的RSS源列表"""
     total = await db.scalar(select(func.count()).select_from(UserRSS).where(UserRSS.user_id == user.id))
 
     result = await db.execute(
@@ -90,6 +92,7 @@ async def get_articles_by_subscription(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """获取指定订阅源下的文章列表"""
     # 验证该订阅是否属于该用户
     result = await db.scalar(
         select(func.count())
@@ -135,6 +138,7 @@ async def get_article_detail(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """获取指定文章的详细信息"""
     # 校验该订阅是否属于当前用户
     has_access = await db.scalar(select(UserRSS).where(UserRSS.user_id == user.id, UserRSS.rss_id == rss_id))
     if not has_access:
@@ -162,6 +166,7 @@ async def unsubscribe_rss(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    """取消订阅一个RSS源"""
     result = await db.execute(
         delete(UserRSS).where(UserRSS.user_id == user.id, UserRSS.rss_id == rss_id).returning(UserRSS.id)
     )
