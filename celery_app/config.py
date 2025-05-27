@@ -2,8 +2,12 @@ from celery.schedules import crontab
 
 from settings import settings
 
-broker_url = f"redis://{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BROKER_NUM}"
-result_backend = f"redis://{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BACKEND_NUM}"
+if settings.redis.URL:
+    broker_url = f"{settings.redis.URL}/{settings.redis.BROKER_NUM}"
+    result_backend = f"{settings.redis.URL}/{settings.redis.BACKEND_NUM}"
+else:
+    broker_url = f"redis://{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BROKER_NUM}"
+    result_backend = f"redis://{settings.redis.HOST}:{settings.redis.PORT}/{settings.redis.BACKEND_NUM}"
 
 # 指定任务序列化方式
 task_serializer = "json"
