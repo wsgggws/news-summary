@@ -21,6 +21,7 @@ class PostgresSettings(BaseSettings):
 
 
 class RedisSettings(BaseSettings):
+    URL: str = ""
     HOST: str = "localhost"
     PORT: int = 6379
     BROKER_NUM: int = 1
@@ -61,7 +62,7 @@ class Settings(BaseSettings):
     RSS_TIMEOUT: float = 15.0
     RSS_LIMITER: int = 5
     RSS_TIME_UNIT: str = "minute"
-    CELERY_BEAT_MINUTES: int = 10
+    CELERY_BEAT_MINUTES: int = 15
 
     USER_AGENT: str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"  # noqa
 
