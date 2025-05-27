@@ -10,7 +10,7 @@ from settings import settings
 
 
 async def get_rss_title(url: Union[str, HttpUrl]) -> str:
-    headers = {"User-Agent": "MyRSSChecker/1.0"}
+    headers = {"User-Agent": settings.USER_AGENT}
     try:
         async with aiohttp.ClientSession(headers=headers, timeout=ClientTimeout(total=settings.RSS_TIMEOUT)) as session:
             async with session.get(str(url)) as response:

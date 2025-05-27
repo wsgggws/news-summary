@@ -59,9 +59,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 7 * 24 * 60
     RSS_TIMEOUT: float = 15.0
-    RSS_LIMITER: int = 3
+    RSS_LIMITER: int = 5
     RSS_TIME_UNIT: str = "minute"
     CELERY_BEAT_MINUTES: int = 10
+
+    USER_AGENT: str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"  # noqa
 
     db: PostgresSettings = PostgresSettings()
     redis: RedisSettings = RedisSettings()

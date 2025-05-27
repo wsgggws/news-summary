@@ -56,8 +56,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     user.last_login = datetime.now(tz=timezone.utc)
     db.add(user)
     await db.commit()
+    await db.refresh(user)
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "username": user.username}
 
 
 @router.get("/me", response_model=UserResponse)

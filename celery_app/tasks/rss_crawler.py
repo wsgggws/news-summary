@@ -14,6 +14,8 @@ from celery_app.llm import async_chat
 from celery_app.util import get_celery_async_session, logger, parse_date, parse_description
 from settings import settings
 
+HEADERS = {"User-Agent": settings.USER_AGENT}
+
 
 @celery_app.task
 def do_one_feed(rss_id: str, feed_url: str):
@@ -74,7 +76,7 @@ async def fetch_feed(url):
     logger.info(f"Fetching RSS feed: {url}")
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(url) as response:
+            async with session.get(url, headers=HEADERS) as response:
                 response.raise_for_status()
                 return await response.read()
         except Exception as e:
@@ -102,7 +104,7 @@ async def _async_download(entry, session, semaphore):
     async with semaphore:
         url = entry.get("link") or ""
         try:
-            async with session.get(url, timeout=ClientTimeout(total=settings.RSS_TIMEOUT)) as response:
+            async with session.get(url, headers=HEADERS, timeout=ClientTimeout(total=settings.RSS_TIMEOUT)) as response:
                 if response.status == 200:
                     entry["article_html"] = await response.text()
                 else:
