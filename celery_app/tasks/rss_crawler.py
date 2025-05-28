@@ -48,9 +48,8 @@ async def do_one_feed_logic(rss_id: str, url: str):
 
 async def enhance_articles(articles: List[Dict]) -> List[Dict]:
     for article in articles:
-        html = article.get("article_html") or ""
+        html = article.pop("article_html") or ""
         markdown = html2text.html2text(html)
-        article["article_md"] = markdown
         if not settings.ai.API_KEY:
             article["summary_md"] = "# TODO"
         else:

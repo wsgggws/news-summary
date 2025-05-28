@@ -76,7 +76,8 @@ async def test_enhence_articles_case1():
         }
     ]
     articles = await enhance_articles(articles)
-    assert "article_md" in articles[0]
+    assert "article_md" not in articles[0]
+    assert "article_html" not in articles[0]
     assert "summary_md" in articles[0]
     # could see example at source.md(html 到 markdown 的转换结果) summary.md(调用 AI 模型的总结)
     # tests/data/articles/*/source.md
