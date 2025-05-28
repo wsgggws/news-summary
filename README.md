@@ -5,9 +5,14 @@
 
 **AI 生成个性化新闻摘要**，并在 [Bilibili](https://space.bilibili.com/472722204?spm_id_from=333.1007.0.0) 有合集分享，敬请期待！🚀
 
-## 前端项目地址
+## 前后端体验(PC体验较好，移动UI还未适应)
 
-- [news-summary-front](https://github.com/wsgggws/news-summary-front)
+- <https://news-summary-front.onrender.com/>
+
+**注册** 或者使用如下用户密码
+
+- username: 码码要洗手
+- password: Mmyxs;!1
 
 ---
 
@@ -88,7 +93,10 @@ make run
 
 ```sh
 # 启动 Celery beat and 2 workers
-make celery-run
+make start-celery
+
+# 停止 Celery beat and 2 workers
+make stop-celery
 ```
 
 由于会使用到 AI 功能，可在 .env 文件里添加相关环境变量，

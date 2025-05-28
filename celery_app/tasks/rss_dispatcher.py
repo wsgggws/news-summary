@@ -1,10 +1,10 @@
 import asyncio
 import logging
 
-from celery import shared_task
 from sqlalchemy.future import select
 
 from app.models.rss import RSSFeed
+from celery_app import celery_app
 from celery_app.tasks.rss_crawler import do_one_feed
 from celery_app.util import get_celery_async_session
 
@@ -30,6 +30,6 @@ async def _dispatch_rss_fetch_logic():
             raise
 
 
-@shared_task
+@celery_app.task
 def dispatch_all_feeds():
     asyncio.run(_dispatch_rss_fetch_logic())
