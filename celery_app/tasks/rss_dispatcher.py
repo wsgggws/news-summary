@@ -32,5 +32,5 @@ async def _dispatch_rss_fetch_logic():
 
 
 @celery_app.task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=3)
-def dispatch_all_feeds():
+def dispatch_all_feeds(self):
     asyncio.run(_dispatch_rss_fetch_logic())

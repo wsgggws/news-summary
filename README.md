@@ -14,6 +14,8 @@
 - username: 码码要洗手
 - password: Mmyxs;!1
 
+![observability](./png/observability.png)
+
 ---
 
 ## 🎯 **项目目标**
