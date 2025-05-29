@@ -41,7 +41,6 @@ async def do_one_feed_logic(rss_id: str, url: str):
         await save_articles_to_db(rss_id, articles)
     except Exception as e:
         logger.error(f"Error in do_one_feed_logic for {rss_id} ({url}): {e}")
-        raise
     else:
         logger.info(f"successful do_one_feed_logic for {rss_id} ({url})")
 
@@ -49,9 +48,12 @@ async def do_one_feed_logic(rss_id: str, url: str):
 async def enhance_articles(articles: List[Dict]) -> List[Dict]:
     for article in articles:
         html = article.pop("article_html") or ""
+        if not html:
+            article["summary_md"] = "# 总结暂未生成，请稍候..."
+            continue
         markdown = html2text.html2text(html)
         if not settings.ai.API_KEY:
-            article["summary_md"] = "# TODO"
+            article["summary_md"] = "# 总结功能不可用，请联系..."
         else:
             article["summary_md"] = await async_chat(content=markdown)
     return articles
@@ -107,6 +109,7 @@ async def _async_download(entry, session, semaphore):
                 if response.status == 200:
                     entry["article_html"] = await response.text()
                 else:
+                    entry["article_html"] = ""
                     logger.warning("%s status %s", url, response.status)
         except Exception as exc:
             logger.error("Download failed %s → %s", url, exc)
