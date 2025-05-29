@@ -17,28 +17,30 @@ from settings import settings
 HEADERS = {"User-Agent": settings.USER_AGENT}
 
 
-@celery_app.task
-def do_one_feed(rss_id: str, feed_url: str):
+@celery_app.task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=3)
+def do_one_feed(self, rss_id: str, feed_url: str):
     asyncio.run(do_one_feed_logic(rss_id, feed_url))
 
 
 async def do_one_feed_logic(rss_id: str, url: str):
     try:
-        feed_html = await fetch_feed(url)
-        if not feed_html:
-            logger.error(f"Failed to fetch feed from {url}")
-            return
+        celery_session_marker = get_celery_async_session()
+        async with celery_session_marker() as session:
+            feed_html = await fetch_feed(url)
+            if not feed_html:
+                logger.error(f"Failed to fetch feed from {url}")
+                return
 
-        entries = parse_feed(html=feed_html)
-        logger.info(f"Parsed {len(entries)} entries from feed")
+            entries = parse_feed(html=feed_html)
+            logger.info(f"Parsed {len(entries)} entries from feed")
 
-        exist_urls = await get_exist_urls(rss_id)
-        entries = discard_exists_entries(entries, exist_urls)
-        logger.info(f"Found {len(entries)} new entries to process")
+            exist_urls = await get_exist_urls(session, rss_id)
+            entries = discard_exists_entries(entries, exist_urls)
+            logger.info(f"Found {len(entries)} new entries to process")
 
-        articles = await fetch_articles(entries)
-        articles = await enhance_articles(articles)
-        await save_articles_to_db(rss_id, articles)
+            articles = await fetch_articles(entries)
+            articles = await enhance_articles(articles)
+            await save_articles_to_db(session, rss_id, articles)
     except Exception as e:
         logger.error(f"Error in do_one_feed_logic for {rss_id} ({url}): {e}")
     else:
@@ -59,12 +61,11 @@ async def enhance_articles(articles: List[Dict]) -> List[Dict]:
     return articles
 
 
-async def get_exist_urls(rss_id) -> set:
+async def get_exist_urls(session, rss_id) -> set:
     exist_links = set()
-    async with get_celery_async_session() as session:
-        articles = await session.execute(select(RSSArticle).where(RSSArticle.rss_id == rss_id))
-        for article in articles.scalars().all():
-            exist_links.add(article.link)
+    articles = await session.execute(select(RSSArticle).where(RSSArticle.rss_id == rss_id))
+    for article in articles.scalars().all():
+        exist_links.add(article.link)
     return exist_links
 
 
@@ -129,14 +130,13 @@ async def fetch_articles(entries):
         return articles
 
 
-async def save_articles_to_db(rss_id, articles: List[Dict]):
-    async with get_celery_async_session() as session:
-        for article in articles or []:
-            new_article = RSSArticle(rss_id=rss_id, **article)
-            session.add(new_article)
-        try:
-            await session.commit()
-            logger.info(f"Saved {len(articles)} new articles to database.")
-        except IntegrityError as e:
-            logger.error(f"IntegrityError during saving articles: {e}")
-            await session.rollback()
+async def save_articles_to_db(session, rss_id, articles: List[Dict]):
+    for article in articles or []:
+        new_article = RSSArticle(rss_id=rss_id, **article)
+        session.add(new_article)
+    try:
+        await session.commit()
+        logger.info(f"Saved {len(articles)} new articles to database.")
+    except IntegrityError:
+        logger.warning("IntegrityError during saving articles: skiping")
+        await session.rollback()
