@@ -6,8 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class PostgresSettings(BaseSettings):
     URL: str = "postgresql+asyncpg://user:password@localhost:5432/newsdb"
-    POOL_SIZE: int = 5
-    MAX_OVERFLOW: int = 10
+    POOL_SIZE: int = 10
+    MAX_OVERFLOW: int = 20
     POOL_TIMEOUT: int = 15
     POOL_RECYCLE: int = 1800
     POOL_PRE_PING: bool = True

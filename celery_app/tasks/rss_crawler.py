@@ -61,8 +61,7 @@ async def enhance_articles(articles: List[Dict]) -> List[Dict]:
 
 async def get_exist_urls(rss_id) -> set:
     exist_links = set()
-    celery_async_session = get_celery_async_session()
-    async with celery_async_session() as session:
+    async with get_celery_async_session() as session:
         articles = await session.execute(select(RSSArticle).where(RSSArticle.rss_id == rss_id))
         for article in articles.scalars().all():
             exist_links.add(article.link)
@@ -131,8 +130,7 @@ async def fetch_articles(entries):
 
 
 async def save_articles_to_db(rss_id, articles: List[Dict]):
-    celery_async_session = get_celery_async_session()
-    async with celery_async_session() as session:
+    async with get_celery_async_session() as session:
         for article in articles or []:
             new_article = RSSArticle(rss_id=rss_id, **article)
             session.add(new_article)

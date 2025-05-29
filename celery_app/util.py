@@ -1,4 +1,5 @@
 import logging
+from contextlib import asynccontextmanager
 
 from dateutil import parser as date_parser
 from parsel import Selector
@@ -9,16 +10,23 @@ from settings import settings
 logger = logging.getLogger(__name__)
 
 
-def get_celery_async_session():
-    engine = create_async_engine(
-        settings.db.URL,
-        pool_size=settings.db.POOL_SIZE,  # 连接池大小，默认值通常是 5；设置过大会浪费资源
-        max_overflow=settings.db.MAX_OVERFLOW,  # 超出 pool_size 后允许的最大连接溢出数
-        pool_timeout=settings.db.POOL_TIMEOUT,  # 从连接池获取连接的最大等待时间（秒），超时会报错
-        pool_recycle=settings.db.POOL_RECYCLE,  # 连接最大复用时间（秒），避免连接被数据库关闭
-        pool_pre_ping=settings.db.POOL_PRE_PING,  # 每次使用连接前是否做“ping”检测，防止连接已失效
-    )
-    return async_sessionmaker(engine)
+engine = create_async_engine(
+    settings.db.URL,
+    pool_size=settings.db.POOL_SIZE,  # 连接池大小，默认值通常是 5；设置过大会浪费资源
+    max_overflow=settings.db.MAX_OVERFLOW,  # 超出 pool_size 后允许的最大连接溢出数
+    pool_timeout=settings.db.POOL_TIMEOUT,  # 从连接池获取连接的最大等待时间（秒），超时会报错
+    pool_recycle=settings.db.POOL_RECYCLE,  # 连接最大复用时间（秒），避免连接被数据库关闭
+    pool_pre_ping=settings.db.POOL_PRE_PING,  # 每次使用连接前是否做“ping”检测，防止连接已失效
+)
+
+CeleryAsyncSessionMaker = async_sessionmaker(engine, expire_on_commit=False)
+
+
+# 用 context manager 管理生命周期
+@asynccontextmanager
+async def get_celery_async_session():
+    async with CeleryAsyncSessionMaker() as session:
+        yield session
 
 
 def parse_date(date_str: str = ""):
