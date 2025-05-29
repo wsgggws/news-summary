@@ -17,6 +17,7 @@ class RSSFeed(Base):
     title: Mapped[str | None] = mapped_column(String, nullable=True)
     last_fetched: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    is_paused: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # ORM 关系
     user_subscriptions = relationship("UserRSS", back_populates="rss_feed", cascade="all, delete-orphan")
