@@ -19,13 +19,12 @@ async def _dispatch_rss_fetch_logic():
             feeds = await session.execute(select(RSSFeed))
             feed_count = 0
             for feed in feeds.scalars():
-                try:
-                    do_one_feed.delay(str(feed.id), str(feed.url))  # type: ignore[attr-defined]
-                    await asyncio.sleep(1.0)
-                    feed_count += 1
-                except Exception as e:
-                    logger.error(f"Failed to dispatch feed {feed.id}: {str(e)}")
-                    raise
+                if feed.is_paused:
+                    logger.warning(f"Feed {feed.title} {feed.url} is paused, ignoring dispatched")
+                    continue
+                do_one_feed.delay(str(feed.id), str(feed.url))  # type: ignore[attr-defined]
+                await asyncio.sleep(1.0)
+                feed_count += 1
             logger.info(f"Successfully dispatched {feed_count} RSS feeds")
     except Exception as e:
         logger.error(f"Error in RSS dispatch: {str(e)}")
