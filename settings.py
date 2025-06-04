@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     RSS_TIMEOUT: float = 15.0
     RSS_LIMITER: int = 5
     RSS_TIME_UNIT: str = "minute"
-    CELERY_BEAT_MINUTES: int = 2  # 本地调试，部署时建议设置环境变量的值为 15 ~ 60
+    CELERY_BEAT_MINUTES: int = 30  # 本地调试，部署时建议设置环境变量的值为 15 ~ 60
 
     USER_AGENT: str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"  # noqa
 
