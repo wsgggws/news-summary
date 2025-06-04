@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      REMOTE_USER: root
+      REMOTE_DIR_BASE: ~/opt/rss/backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Create timestamp and archive code
+        run: |
+          TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+          echo "DEPLOY_DIR=$TIMESTAMP" >> $GITHUB_ENV
+          mkdir deploy
+          cp -r ./* .env deploy/
+          tar -czf build.tar.gz -C deploy .
+
+      - name: Upload and extract on server
+        run: |
+          REMOTE_PATH=${{ env.REMOTE_DIR_BASE }}/${{ env.DEPLOY_DIR }}
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "mkdir -p $REMOTE_PATH"
+          scp -o StrictHostKeyChecking=no build.tar.gz $REMOTE_USER@${{ secrets.REMOTE_IP }}:$REMOTE_PATH/
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "cd $REMOTE_PATH && tar -xzf build.tar.gz && rm build.tar.gz"
+
+      - name: Cleanup old deployments (optional)
+        run: |
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "cd ${{ env.REMOTE_DIR_BASE }} && python3 delete.py"
+
+      - name: Restart backend service
+        run: |
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "cd ${{ env.REMOTE_DIR_BASE }}/${{ env.DEPLOY_DIR }} && make run"
