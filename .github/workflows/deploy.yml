@@ -1,5 +1,6 @@
 name: Deploy
 
+# on: [push, pull_request]
 on:
   push:
     tags:
@@ -11,7 +12,7 @@ jobs:
 
     env:
       REMOTE_USER: root
-      REMOTE_DIR_BASE: ~/opt/rss/backend
+      REMOTE_DEPLOY_DIR: /root/opt/rss/backend/deploy
 
     steps:
       - name: Checkout code
@@ -26,25 +27,20 @@ jobs:
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
 
-      - name: Create timestamp and archive code
+      - name: Create archive code
         run: |
-          TIMESTAMP=$(date +'%Y%m%d%H%M%S')
-          echo "DEPLOY_DIR=$TIMESTAMP" >> $GITHUB_ENV
           mkdir deploy
-          cp -r ./* .env deploy/
+          rsync -av --exclude=deploy . deploy/
+          cp .env deploy/
           tar -czf build.tar.gz -C deploy .
 
-      - name: Upload and extract on server
+      - name: Add host to known_hosts
         run: |
-          REMOTE_PATH=${{ env.REMOTE_DIR_BASE }}/${{ env.DEPLOY_DIR }}
-          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "mkdir -p $REMOTE_PATH"
-          scp -o StrictHostKeyChecking=no build.tar.gz $REMOTE_USER@${{ secrets.REMOTE_IP }}:$REMOTE_PATH/
-          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "cd $REMOTE_PATH && tar -xzf build.tar.gz && rm build.tar.gz"
+          ssh-keyscan -H ${{ secrets.REMOTE_IP }} >> ~/.ssh/known_hosts
 
-      - name: Cleanup old deployments (optional)
+      - name: Upload and extract, then Run
         run: |
-          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "cd ${{ env.REMOTE_DIR_BASE }} && python3 delete.py"
-
-      - name: Restart backend service
-        run: |
-          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "cd ${{ env.REMOTE_DIR_BASE }}/${{ env.DEPLOY_DIR }} && make run"
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "mkdir -p $REMOTE_DEPLOY_DIR"
+          scp -o StrictHostKeyChecking=no build.tar.gz $REMOTE_USER@${{ secrets.REMOTE_IP }}:$REMOTE_DEPLOY_DIR/
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "cd $REMOTE_DEPLOY_DIR && tar -xzf build.tar.gz && rm build.tar.gz"
+          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} "cd $REMOTE_DEPLOY_DIR && make docker-run"

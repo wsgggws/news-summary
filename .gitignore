@@ -178,3 +178,9 @@ nohup.out
 
 .log/
 .pids/
+
+ssl/
+*.key
+*.crt
+
+data
