@@ -61,6 +61,12 @@ pytest-async-sqlalchemy = "^0.2.0"
 gevent = "^24.11.1"
 pytest-recording = "^0.13.2"
 
+
+[[tool.poetry.source]]
+name = "aliyun"
+url = "http://mirrors.aliyun.com/pypi/simple"
+priority = "primary"
+
 [tool.ruff]
 target-version = "py311"
 line-length = 120
