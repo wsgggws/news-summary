@@ -7,7 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions import RSSInvalidException, RSSNotFoundException, RSSSubscribeRepeatException, UserBannedException
 from app.models.rss import RSSArticle, RSSFeed, UserRSS
 from app.models.user import User
-from app.schemas.rss import RSSSubscribeRequest, RSSSubscribeResponse
+from app.schemas.rss import (
+    RSSArticleResponse,
+    RSSArticlesListResponse,
+    RSSSubscribeRequest,
+    RSSSubscribeResponse,
+    RSSSubscribesListResponse,
+)
 from app.services.auth import get_current_user
 from app.services.database import get_db
 from app.utils.limiter import rss_limiter
@@ -60,7 +66,7 @@ async def subscribe_rss(
     return {"id": rss_id, "title": rss_title, "url": rss_url, "message": "success"}
 
 
-@router.get("/subscriptions")
+@router.get("/subscriptions", response_model=RSSSubscribesListResponse)
 async def get_subscriptions(
     limit: int = Query(10, gt=0),
     offset: int = Query(0, ge=0),
@@ -84,7 +90,7 @@ async def get_subscriptions(
     }
 
 
-@router.get("/subscriptions/{rss_id}/articles")
+@router.get("/subscriptions/{rss_id}/articles", response_model=RSSArticlesListResponse)
 async def get_articles_by_subscription(
     rss_id: UUID = Path(...),
     limit: int = Query(10, gt=0, le=100),
@@ -123,7 +129,6 @@ async def get_articles_by_subscription(
                 "title": a.title,
                 "link": a.link,
                 "published_at": a.published_at,
-                "summary_md": a.summary_md,
             }
             for a in articles
         ],
@@ -131,7 +136,7 @@ async def get_articles_by_subscription(
     }
 
 
-@router.get("/subscriptions/{rss_id}/articles/{article_id}")
+@router.get("/subscriptions/{rss_id}/articles/{article_id}", response_model=RSSArticleResponse)
 async def get_article_detail(
     rss_id: UUID = Path(...),
     article_id: UUID = Path(...),
