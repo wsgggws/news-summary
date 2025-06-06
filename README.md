@@ -5,9 +5,11 @@
 
 **AI 生成个性化新闻摘要**，并在 [Bilibili](https://space.bilibili.com/472722204?spm_id_from=333.1007.0.0) 有合集分享，敬请期待！🚀
 
-## 前后端体验(部署在 aliyun, 域名备案还在审批中。PC体验较好，移动UI还未适应)
+## 前后端体验(部署在 aliyun, 域名备案还在审批中, 支持 PC 及 移动端浏览器)
 
 - <http://47.107.131.245/>
+
+[查看页面效果](https://github.com/wsgggws/news-summary-front)
 
 **注册** 或者使用如下用户密码
 
@@ -40,10 +42,10 @@
 - [x] pydantic-settings（配置管理）
 - [x] 新闻爬取 & 存储（Celery + asyncio + aiohttp + parsel）
 - [x] AI 生成摘要（DeepSeek API）
+- [x] CICD (Github actions 一键部署到 aliyun ECS 并启动)
 - [ ] 错误追踪 （Sentry ）
 - [ ] 个性化推荐（TF-IDF / 余弦相似度）
 - [ ] Redis 缓存（新闻数据与个性化推荐）
-- [ ] Docker 一键启动
 
 ---
 
