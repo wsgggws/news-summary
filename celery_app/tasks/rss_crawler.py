@@ -10,14 +10,14 @@ from sqlalchemy.future import select
 
 from app.models.rss import RSSArticle
 from celery_app import celery_app
-from celery_app.llm import async_chat
+from celery_app.llm import sem_async_chat
 from celery_app.util import get_celery_async_session, logger, parse_date, parse_description
 from settings import settings
 
 HEADERS = {"User-Agent": settings.USER_AGENT}
 
 
-@celery_app.task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=3)
+@celery_app.task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=2)
 def do_one_feed(self, rss_id: str, feed_url: str):
     asyncio.run(do_one_feed_logic(rss_id, feed_url))
 
@@ -39,6 +39,7 @@ async def do_one_feed_logic(rss_id: str, url: str):
             logger.info(f"Found {len(entries)} new entries to process")
 
             articles = await fetch_articles(entries)
+            articles = md_articles(articles)
             articles = await enhance_articles(articles)
             await save_articles_to_db(session, rss_id, articles)
     except Exception as e:
@@ -47,18 +48,28 @@ async def do_one_feed_logic(rss_id: str, url: str):
         logger.info(f"successful do_one_feed_logic for {rss_id} ({url})")
 
 
-async def enhance_articles(articles: List[Dict]) -> List[Dict]:
+def md_articles(articles: List[Dict]) -> List[Dict]:
     for article in articles:
         html = article.pop("article_html") or ""
         if not html:
-            article["summary_md"] = "# 总结暂未生成，请稍候..."
+            article["summary_md"] = ""
             continue
         markdown = html2text.html2text(html)
-        if not settings.ai.API_KEY:
-            article["summary_md"] = "# 总结功能不可用，请联系..."
-        else:
-            article["summary_md"] = await async_chat(content=markdown)
+        article["summary_md"] = markdown
     return articles
+
+
+async def enhance_articles(articles: List[Dict]) -> List[Dict]:
+    semaphore = asyncio.Semaphore(10)  # 限制并发数
+    tasks = [sem_async_chat(article, semaphore) for article in articles or []]
+    raw_results = await asyncio.gather(*tasks, return_exceptions=True)
+    result = []
+    for item in raw_results:
+        if isinstance(item, Exception):
+            logger.error("Article download exception: %s", item)
+            continue
+        result.append(item)
+    return result
 
 
 async def get_exist_urls(session, rss_id) -> set:
@@ -70,7 +81,14 @@ async def get_exist_urls(session, rss_id) -> set:
 
 
 def discard_exists_entries(entries, exist_urls) -> List:
-    return [entry for entry in entries if entry.get("link") not in exist_urls]
+    result = []
+    unique_urls = set(exist_urls or [])
+    for entry in entries or []:
+        link = entry.get("link") or ""
+        if link not in unique_urls:
+            result.append(entry)
+            unique_urls.add(link)
+    return result
 
 
 async def fetch_feed(url):
@@ -89,13 +107,13 @@ def parse_feed(html):
     entries = []
     feed = feedparser.parse(html)
     for entry in feed.entries:
-        description = parse_description(entry.get("summary") or entry.get("description") or "")
+        description = parse_description(str(entry.get("summary") or entry.get("description") or ""))
         entries.append(
             {
                 "title": entry.get("title", ""),
                 "link": entry.get("link", ""),
                 "description": description,
-                "published_at": parse_date(entry.get("published") or ""),
+                "published_at": parse_date(str(entry.get("published") or "")),
             }
         )
     return entries

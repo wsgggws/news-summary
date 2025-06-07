@@ -5,7 +5,7 @@
 
 **AI 生成个性化新闻摘要**，并在 [Bilibili](https://space.bilibili.com/472722204?spm_id_from=333.1007.0.0) 有合集分享，敬请期待！🚀
 
-## 前后端体验(部署在 aliyun, 域名备案还在审批中, 支持 PC 及 移动端浏览器)
+## 前后端体验(部署在 aliyun, 域名备案还在审批中, 支持 PC 及 移动端)
 
 - <http://47.107.131.245/>
 
@@ -89,16 +89,21 @@ curl -sSL https://install.python-poetry.org | python3 - --version 2.1.2
 ## 🚀 **如何本地运行**
 
 ```sh
-# 启动 WebAPI
-make run
+# 使用 poetry install python package
+make install
 ```
 
 ```sh
-# 启动 Celery beat and 2 workers
-make start-celery
+# 本地启动 WebAPI
+make local-run
+```
 
-# 停止 Celery beat and 2 workers
-make stop-celery
+```sh
+# 启动 Celery beat and worker
+make local-celery-start
+
+# 停止 Celery beat and worker
+make local-celery-stop
 ```
 
 由于会使用到 AI 功能，可在 .env 文件里添加相关环境变量，
@@ -106,8 +111,8 @@ make stop-celery
 
 ```.env
 LLM_API_KEY="XXX"
-LLM_BASE_URL="https://xxx"
-LLM_MODEL="YYY"
+LLM_BASE_URL="https://xxx" # Options 默认使用 DeepSeek
+LLM_MODEL="YYY" # Options 默认使用 deepseek-chat
 ```
 
 <details>
@@ -116,8 +121,8 @@ OpenTelemetry-Instrument 启动, 并观测 Metrics, Traces, Logs
 </summary>
 
 ```sh
-# 注意没有也不建议使用 --reload 启动
-make otel-run
+# 注意不能添加 --reload 启动
+make local-otel-run
 ```
 
 ![metrics](./png/prometheus-metrics.png)

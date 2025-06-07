@@ -26,7 +26,6 @@ FROM swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/python:3.11-slim AS runt
 # 设置虚拟环境路径
 ENV VIRTUAL_ENV=/news-summary/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-ENV APP_ENV="docker"
 
 # 设置工作目录
 WORKDIR /news-summary
@@ -40,4 +39,4 @@ COPY . .
 # 暴露端口
 EXPOSE 8000
 
-CMD ["sh", "./scripts/entrypoint.sh"]
+CMD ["sh", "./scripts/start-web.sh"]

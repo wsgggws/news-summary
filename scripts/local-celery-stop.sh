@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "🛑 正在停止 Celery 进程..."
+echo "🛑 正在停止 Celery 进程."
 
 pids=$(pgrep -f "celery" || true) # 加上 || true，防止无进程时脚本退出
 

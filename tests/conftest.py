@@ -10,7 +10,6 @@ from app.main import app
 from app.services.database import Base, engine
 from settings import settings
 
-assert settings.APP_ENV == "ci"
 assert settings.db.URL.endswith("test_newsdb")
 
 
