@@ -2,7 +2,7 @@
 set -euo pipefail
 
 echo "📦 关闭旧容器."
-docker compose down -v || true
+docker compose down || true
 echo "📦 启动所有服务."
 docker compose up -d
 

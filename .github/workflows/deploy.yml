@@ -10,25 +10,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      REMOTE_USER: root
-      REMOTE_DEPLOY_DIR: /root/deploy/backend
-
     steps:
       - name: ✅ Checkout code
         uses: actions/checkout@v3
-
-      - name: 🕵️ Debug workspace
-        run: ls -al && du -sh *
 
       - name: 📤 Copy project files to server via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.REMOTE_IP }}
-          username: ${{ env.REMOTE_USER }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "./"
-          target: "${{ env.REMOTE_DEPLOY_DIR }}"
+          target: "${{ secrets.REMOTE_BACKEND_DIR }}"
           strip_components: 0
 
       - name: 📄 Create .env file and Copy .env to server via SCP
@@ -38,10 +31,10 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.REMOTE_IP }}
-          username: ${{ env.REMOTE_USER }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: ".env"
-          target: "${{ env.REMOTE_DEPLOY_DIR }}"
+          target: "${{ secrets.REMOTE_BACKEND_DIR }}"
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.3
@@ -50,7 +43,8 @@ jobs:
 
       - name: 🚀 Deploy on server
         run: |
-          ssh -o StrictHostKeyChecking=no $REMOTE_USER@${{ secrets.REMOTE_IP }} <<EOF
-            cd $REMOTE_DEPLOY_DIR
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.REMOTE_IP }} <<EOF
+            cd ${{ secrets.REMOTE_BACKEND_DIR}}
             make docker-run
+            docker compose restart nginx
           EOF

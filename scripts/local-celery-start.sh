@@ -5,7 +5,7 @@ set -euo pipefail
 mkdir -p .log .pids
 
 echo "🐘 启动 DB, Redis."
-docker compose up -d db redis -v
+docker compose up -d db redis
 
 echo "📦 加载环境变量 .env.local."
 set -a

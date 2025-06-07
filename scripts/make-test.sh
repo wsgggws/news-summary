@@ -3,7 +3,7 @@
 set -euo pipefail
 
 echo "📦 关闭旧容器..."
-docker compose down db test-db -v || true
+docker compose down db test-db || true
 echo "🐘 启动 PostgreSQL test-db 数据库..."
 docker compose up -d test-db
 

@@ -7,7 +7,7 @@
 set -euo pipefail
 
 echo "📦 关闭旧容器..."
-docker compose down db -v || true
+docker compose down db || true
 
 echo "🐘 启动 DB."
 docker compose up -d db
