@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 from dateutil.tz import tzutc
 
-from celery_app.tasks.rss_crawler import enhance_articles, parse_feed
+from celery_app.tasks.rss_crawler import enhance_articles, md_articles, parse_feed
 
 # TODO 最好是使用 VCR 这类工具将每个 feed 及 articles 自动做个记录，下次跑测试时可以模拟网络请求
 
@@ -75,6 +75,7 @@ async def test_enhence_articles_case1():
             "article_html": html,
         }
     ]
+    articles = md_articles(articles)
     articles = await enhance_articles(articles)
     assert "article_md" not in articles[0]
     assert "article_html" not in articles[0]

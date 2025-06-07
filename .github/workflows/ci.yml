@@ -30,10 +30,11 @@ jobs:
         run: poetry install --no-interaction
 
       - name: Run tests
-        env:
-          PYTHONPATH: .
-          APP_ENV: ci
-        run: poetry run pytest tests --cov=app --cov-report=xml
+        run: |
+          set -a
+          source .env.ci
+          set +a
+          poetry run pytest tests --cov=app --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

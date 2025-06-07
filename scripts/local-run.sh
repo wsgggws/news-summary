@@ -7,10 +7,10 @@
 set -euo pipefail
 
 echo "📦 关闭旧容器..."
-docker compose down
+docker compose down db -v || true
 
-echo "🐘 启动 DB, Redis..."
-docker compose up -d db redis
+echo "🐘 启动 DB."
+docker compose up -d db
 
 echo "📦 加载环境变量..."
 set -a

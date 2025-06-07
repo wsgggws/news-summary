@@ -23,7 +23,6 @@ async def _dispatch_rss_fetch_logic():
                     logger.warning(f"Feed {feed.title} {feed.url} is paused, ignoring dispatched")
                     continue
                 do_one_feed.delay(str(feed.id), str(feed.url))  # type: ignore[attr-defined]
-                await asyncio.sleep(1.0)
                 feed_count += 1
             logger.info(f"Successfully dispatched {feed_count} RSS feeds")
     except Exception as e:
@@ -31,6 +30,6 @@ async def _dispatch_rss_fetch_logic():
         raise
 
 
-@celery_app.task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=3)
+@celery_app.task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=2)
 def dispatch_all_feeds(self):
     asyncio.run(_dispatch_rss_fetch_logic())
