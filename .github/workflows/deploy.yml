@@ -46,5 +46,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.REMOTE_IP }} <<EOF
             cd ${{ secrets.REMOTE_BACKEND_DIR}}
             make docker-run
-            docker compose restart nginx
           EOF

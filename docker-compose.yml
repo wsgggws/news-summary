@@ -58,7 +58,7 @@ services:
 
   # 数据库服务
   db:
-    image: postgres:13
+    image: postgres:16
     container_name: pg
     environment:
       POSTGRES_USER: user
@@ -66,8 +66,10 @@ services:
       POSTGRES_DB: newsdb
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+      - ./config/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
     ports:
       - "127.0.0.1:5432:5432" # 本地 web 连接, SSH 隧道访问 PostgreSQL
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d newsdb"]
       interval: 2s
@@ -77,7 +79,7 @@ services:
       - otel-net
 
   test-db:
-    image: postgres:13
+    image: postgres:16
     container_name: test-db
     environment:
       POSTGRES_USER: test_user
@@ -132,7 +134,7 @@ services:
 
   # Sentry 的 PostgreSQL 数据库
   # sentry-postgres:
-  #   image: postgres:13
+  #   image: postgres:16
   #   container_name: news-summary-sentry-postgres
   #   environment:
   #     POSTGRES_USER: sentry
