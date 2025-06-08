@@ -29,4 +29,7 @@ docker network prune -f
 echo "5. 删除 buildx 缓存（如果存在）..."
 docker builder prune -f || true
 
+echo "6. 删除所有匿名卷 ..."
+docker volume ls -qf dangling=true | xargs -r docker volume rm
+
 echo "✅ 强力清理完成！"
