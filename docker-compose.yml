@@ -7,7 +7,7 @@ services:
     container_name: web # 自定义容器名称
     volumes:
       - .:/news-summary:z # 确保和 Dockerfile 里的 WORKDIR 一致
-      - /news-summary/.venv # 避免覆盖 .venv, 开发环境必须要设置
+      - venv_data:/news-summary/.venv # 避免覆盖 .venv, 开发环境必须要设置
     ports:
       - "8000:8000" # 暴露 FastAPI 端口
     env_file:
@@ -283,6 +283,7 @@ services:
 
 # 定义卷
 volumes:
+  venv_data:
   postgres_test_data:
   grafana_data:
   tempo_data:

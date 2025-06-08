@@ -23,7 +23,7 @@ jobs:
           host: ${{ secrets.REMOTE_IP }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./"
+          source: ".,!notes,!tests,!png,!.git,!.github,!.env.ci,!.env.local"
           target: "${{ secrets.REMOTE_BACKEND_DIR }}"
           strip_components: 0
 
