@@ -23,3 +23,6 @@ else
   echo "🔁 nginx 已在运行，执行重启"
   docker compose restart nginx
 fi
+
+echo "🧼 删除旧 <none> 镜像..."
+docker images --filter "dangling=true" -q | xargs -r docker rmi

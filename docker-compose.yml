@@ -1,6 +1,7 @@
 services:
   # Web 服务
   web:
+    image: news-summary/web:latest
     build:
       context: . # 使用当前目录下的 Dockerfile
       dockerfile: Dockerfile # 指定 Dockerfile 路径
@@ -21,6 +22,7 @@ services:
     command: ["sh", "./scripts/start-web.sh"]
 
   celery-worker:
+    image: news-summary/celery-worker:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -39,6 +41,7 @@ services:
       - otel-net
 
   celery-beat:
+    image: news-summary/celery-beat:latest
     build:
       context: .
       dockerfile: Dockerfile
