@@ -49,9 +49,33 @@ CREATE EXTENSION pg_stat_statements;
 ```sh
 SELECT * FROM pg_extension WHERE extname = 'pg_stat_statements';
 
-SELECT query, calls, total_time, mean_time
+SELECTkkkkkkj
+  query,
+  calls,
+  total_exec_time,
+  mean_exec_time,
+  rows
 FROM pg_stat_statements
-ORDER BY total_time DESC
+ORDER BY total_exec_time DESC
 LIMIT 10;
+```
 
+## 定期查看 top SQL
+
+```sh
+CREATE VIEW top_slow_queries AS
+SELECT
+  query,
+  calls,
+  total_exec_time,
+  mean_exec_time,
+  rows
+FROM pg_stat_statements
+ORDER BY total_exec_time DESC
+LIMIT 50;
+```
+
+```sh
+# 查看
+SELECT * FROM top_slow_queries;
 ```
