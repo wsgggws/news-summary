@@ -1,1 +1,6 @@
 tests/data/** linguist-detectable=false
+.git/ export-ignore
+tests/ export-ignore
+png/ export-ignore
+notes/ export-ignore
+.gitattributes export-ignore # 通常也把这个文件本身排除掉

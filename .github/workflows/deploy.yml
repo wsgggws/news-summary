@@ -14,6 +14,9 @@ jobs:
       - name: ✅ Checkout code
         uses: actions/checkout@v3
 
+      - name: 📄 Create .env file and Copy .env to server via SCP
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
       - name: 📤 Copy project files to server via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -23,18 +26,6 @@ jobs:
           source: "./"
           target: "${{ secrets.REMOTE_BACKEND_DIR }}"
           strip_components: 0
-
-      - name: 📄 Create .env file and Copy .env to server via SCP
-        run: echo "${{ secrets.ENV_FILE }}" > .env
-
-      - name: 📤 Copy .env to server via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.REMOTE_IP }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".env"
-          target: "${{ secrets.REMOTE_BACKEND_DIR }}"
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.3
