@@ -1,5 +1,3 @@
-import logging
-
 # import sentry_sdk
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
@@ -40,9 +38,6 @@ app.include_router(rss.router)
 
 setup_exception_handlers(app)
 setup_middlewares(app)
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 @app.get("/whoami")

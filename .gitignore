@@ -184,3 +184,5 @@ ssl/
 *.crt
 
 data
+logs
+*.sql
