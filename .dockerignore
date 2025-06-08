@@ -7,3 +7,6 @@ __pycache__
 .DS_Store
 venv
 env
+notes/
+png/
+*.db

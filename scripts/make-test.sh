@@ -3,7 +3,8 @@
 set -euo pipefail
 
 echo "📦 关闭旧容器..."
-docker compose down db test-db || true
+docker compose down test-db || true
+
 echo "🐘 启动 PostgreSQL test-db 数据库..."
 docker compose up -d test-db
 
@@ -20,3 +21,6 @@ else
   echo "🧪 运行 pytest with args: $*"
   pytest "$@"
 fi
+
+echo "🧼 删除旧 <none> 镜像..."
+docker images --filter "dangling=true" -q | xargs -r docker rmi
