@@ -1,7 +1,7 @@
 services:
   # Web 服务
   web:
-    image: news-summary/web:latest
+    image: web:latest
     build:
       context: . # 使用当前目录下的 Dockerfile
       dockerfile: Dockerfile # 指定 Dockerfile 路径
@@ -22,7 +22,7 @@ services:
     command: ["sh", "./scripts/start-web.sh"]
 
   celery-worker:
-    image: news-summary/celery-worker:latest
+    image: celery-worker:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -41,7 +41,7 @@ services:
       - otel-net
 
   celery-beat:
-    image: news-summary/celery-beat:latest
+    image: celery-beat:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -194,9 +194,8 @@ services:
     volumes:
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ${REMOTE_FRONT_ROOT}/dist:/usr/share/nginx/html:ro
-      # - /var/www/certbot:/var/www/certbot:ro
-      # - ./data/certbot/conf:/etc/letsencrypt:ro
-      # - ./data/certbot/www:/var/www/certbot:ro
+      - ./data/certbot/conf:/etc/letsencrypt:ro
+      - ./data/certbot/www:/var/www/certbot:ro
     depends_on:
       - web
     restart: always
